@@ -153,6 +153,7 @@ class MyWindow(QWidget):
             if amount_text[i].strip() and int(quantity_text[i]) > 0 :
                 msg += f'{product_text[i]} ,金額 {amount_text[i]}, 數量 {quantity_text[i]} \n'
                 TotalAmount += int(amount_text[i])
+        TotalAmount += int(self.taxAmount.text())
         msg += f'進項稅額　{self.taxAmount.text()} \n'
         msg += f'現　　金　{TotalAmount} \n'
         msg += "請問是否確認存檔?"
