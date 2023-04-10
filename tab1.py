@@ -1,31 +1,20 @@
-import sys
 from PyQt5.QtWidgets import QApplication, QMessageBox, QHBoxLayout, QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout, QComboBox, QTabWidget
-import openpyxl
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-from tab2 import Tab2Widget
+import openpyxl
 
-class MyWindow(QWidget):
-    def __init__(self):
-        super().__init__()
+class Tab1Widget(QWidget):
+    def __init__(self, options, parent):
+        super().__init__(parent)
+        self.options = options
+        #print(self.options)
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('My Window')
-
-
-        options = []
-
-        # 從檔案讀取選項
-        with open('products.txt', 'r') as f:
-            for line in f:
-                # 每行一個選項，存儲在list中
-                options.append(line.strip())
-
         self.combos = []
         for i in range(5) :
             combo = QComboBox(self)
-            for option in options :
+            for option in self.options :
                 combo.addItem(option)
                 combo.setFont(QtGui.QFont('Arial', 12))
             self.combos.append(combo)
@@ -55,7 +44,7 @@ class MyWindow(QWidget):
         font = QtGui.QFont("Arial", 12)  # 設定字型為Arial，字體大小為14
         for i in range(5):
             hbox = QHBoxLayout()
-            label0 = QLabel(f'{i+1} 進貨品項', self)          
+            label0 = QLabel(f'{i+1} 品項', self)          
             label0.setFont(font)
             hbox.addWidget(label0)
             hbox.addWidget(self.combos[i])
@@ -82,7 +71,7 @@ class MyWindow(QWidget):
         self.taxAmount.setFont(QtGui.QFont('Arial', 12))
         self.taxAmount.setValidator(QtGui.QIntValidator())
         hbox_tax.addWidget(self.taxAmount)
-        hbox_tax.addWidget(QLabel("-------------------------------------------------------------------------------------"))
+        hbox_tax.addWidget(QLabel("--------------------------------------------------------------------------------------------------"))
 
         # 送出按鈕
         self.button = QPushButton('送出')
@@ -101,40 +90,12 @@ class MyWindow(QWidget):
         #
         self.vbox1.addLayout(hbox_tax)
         self.vbox1.addWidget(self.button)
-        #self.vbox1.addWidget(self.button2)
 
-        tab1 = QWidget()
-        tab1.setLayout(self.vbox1)
-
-
-        # 創建第二個頁籤 
-        tab2 = Tab2Widget(options)
-
-
-        # 創建標籤式選項卡，添加兩個頁籤
-        tabs = QTabWidget()
-        tabs.addTab(tab1, '進貨')
-        tabs.addTab(tab2, '銷貨')
-
-        # 設置窗口布局
-        vbox = QVBoxLayout()
-        vbox.addWidget(tabs)
-        self.setLayout(vbox)
+        self.setLayout(self.vbox1)
 
         # 設置按鈕點擊事件處理函數
         self.button.clicked.connect(self.buttonClicked)
         #self.button2.clicked.connect(self.resetData)
-
-
-    # 找出指定工作表中 A 欄最後一個非空單元格的位置，並回傳下一個單元格的索引    
-    def find_last_empty_row(self,sh):
-        max_row = sh.max_row
-        for i in range(max_row, 0, -1):
-            if sh.cell(row=i, column=1).value is not None:
-                max_row = i
-                break        
-        return max_row
-
 
     def buttonClicked(self):
         # 按鈕點擊事件處理函數 讀取介面內容
@@ -256,8 +217,11 @@ class MyWindow(QWidget):
             self.quantity[i].setCurrentIndex(0)
             self.taxAmount.clear()
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = MyWindow()
-    window.show()
-    sys.exit(app.exec_())
+    # 找出指定工作表中 A 欄最後一個非空單元格的位置，並回傳下一個單元格的索引    
+    def find_last_empty_row(self,sh):
+        max_row = sh.max_row
+        for i in range(max_row, 0, -1):
+            if sh.cell(row=i, column=1).value is not None:
+                max_row = i
+                break        
+        return max_row
