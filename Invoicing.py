@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QHBoxLayout, QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout, QComboBox, QTabWidget
+from PyQt5.QtWidgets import QApplication, QMessageBox, QHBoxLayout, QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout, QComboBox, QTabWidget
 import openpyxl
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
@@ -81,11 +81,15 @@ class MyWindow(QWidget):
         self.taxAmount.setFont(QtGui.QFont('Arial', 12))
         self.taxAmount.setValidator(QtGui.QIntValidator())
         hbox_tax.addWidget(self.taxAmount)
-        hbox_tax.addWidget(QLabel("---------------------------------------------------------------------------------"))
+        hbox_tax.addWidget(QLabel("-------------------------------------------------------------------------------------"))
 
-        # 
+        # 送出按鈕
         self.button = QPushButton('送出')
         self.button.setFont(QtGui.QFont('Arial', 12))
+
+        # 清除按鈕
+        #self.button2 = QPushButton('清除')
+        #self.button2.setFont(QtGui.QFont('Arial', 12))
 
 
         # 创建垂直布局，并将水平布局添加到垂直布局中
@@ -96,6 +100,7 @@ class MyWindow(QWidget):
         #
         self.vbox1.addLayout(hbox_tax)
         self.vbox1.addWidget(self.button)
+        #self.vbox1.addWidget(self.button2)
 
         tab1 = QWidget()
         tab1.setLayout(self.vbox1)
@@ -109,8 +114,8 @@ class MyWindow(QWidget):
 
         # 創建標籤式選項卡，添加兩個頁籤
         tabs = QTabWidget()
-        tabs.addTab(tab1, '頁籤一')
-        tabs.addTab(tab2, '頁籤二')
+        tabs.addTab(tab1, '進貨')
+        tabs.addTab(tab2, '出貨')
 
         # 設置窗口布局
         vbox = QVBoxLayout()
@@ -119,6 +124,7 @@ class MyWindow(QWidget):
 
         # 設置按鈕點擊事件處理函數
         self.button.clicked.connect(self.buttonClicked)
+        #self.button2.clicked.connect(self.resetData)
 
 
     # 找出指定工作表中 A 欄最後一個非空單元格的位置，並回傳下一個單元格的索引    
@@ -136,12 +142,33 @@ class MyWindow(QWidget):
         product_text = []
         amount_text = []
         quantity_text = []
+        TotalAmount = 0
         for i in range(5):
             product_text.append(self.combos[i].currentText())
             amount_text.append(self.amount_edit[i].text())
             quantity_text.append(self.quantity[i].currentText())
 
+        msg = ""
+        for i in range(5) :
+            if amount_text[i].strip() or int(quantity_text[i]) > 0 :
+                msg += f'{product_text[i]} ,金額 {amount_text[i]}, 數量 {quantity_text[i]} \n'
+                TotalAmount += int(amount_text[i])
+        msg += f'進項稅額　{self.taxAmount.text()} \n'
+        msg += f'現　　金　{TotalAmount} \n'
+        msg += "請問是否確認存檔?"
+        msg_box = QMessageBox()
+        msg_box.setWindowTitle('確認')
+        msg_box.setText(msg)
+        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        choice = msg_box.exec_()
 
+        # If user clicks "Yes", save Excel file
+        if choice == QMessageBox.No:
+             QMessageBox.information(self, 'Save Excel', '動作取消')
+             return
+        else:
+            pass
+    
         # 打開 Excel 文件
         try:
             wb = openpyxl.load_workbook('112財報資料.xlsx', read_only=False)
@@ -156,14 +183,13 @@ class MyWindow(QWidget):
         max_row = self.find_last_empty_row(sheet)
 
         # 在最後一行的下一行插入新資料
-        TotalAmount = 0
         for i in range(5):
             if int(quantity_text[i]) > 0:
                 max_row += 1
                 sheet.cell(row=max_row, column=1).value = "-"
                 sheet.cell(row=max_row, column=2).value = product_text[i]
                 sheet.cell(row=max_row, column=4).value = int(amount_text[i])
-                TotalAmount += int(amount_text[i])
+   
         
         # 進項稅額
         tax_amount = self.taxAmount.text()
@@ -219,7 +245,16 @@ class MyWindow(QWidget):
         # 保存文件
         wb.save('112財報資料.xlsx')
         print('已將資料寫入 Excel 文件')
+        QMessageBox.information(self, 'Save Excel', '資料寫入成功')
+        self.resetData() # 重置資料
 
+    # 重置資料
+    def resetData(self):
+        for i in range(5):
+            self.combos[i].setCurrentIndex(0)
+            self.amount_edit[i].clear()
+            self.quantity[i].setCurrentIndex(0)
+            self.taxAmount.clear()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
