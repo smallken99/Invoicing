@@ -164,7 +164,6 @@ class MyWindow(QWidget):
 
         # If user clicks "Yes", save Excel file
         if choice == QMessageBox.No:
-             QMessageBox.information(self, 'Save Excel', '動作取消')
              return
         else:
             pass
