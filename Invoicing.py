@@ -150,7 +150,7 @@ class MyWindow(QWidget):
 
         msg = ""
         for i in range(5) :
-            if amount_text[i].strip() or int(quantity_text[i]) > 0 :
+            if amount_text[i].strip() and int(quantity_text[i]) > 0 :
                 msg += f'{product_text[i]} ,金額 {amount_text[i]}, 數量 {quantity_text[i]} \n'
                 TotalAmount += int(amount_text[i])
         msg += f'進項稅額　{self.taxAmount.text()} \n'
@@ -184,7 +184,7 @@ class MyWindow(QWidget):
 
         # 在最後一行的下一行插入新資料
         for i in range(5):
-            if int(quantity_text[i]) > 0:
+            if amount_text[i].strip() and int(quantity_text[i]) > 0:
                 max_row += 1
                 sheet.cell(row=max_row, column=1).value = "-"
                 sheet.cell(row=max_row, column=2).value = product_text[i]
