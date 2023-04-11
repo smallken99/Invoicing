@@ -11,6 +11,7 @@ class Tab1Widget(QWidget):
         self.initUI()
 
     def initUI(self):
+        font = QtGui.QFont("Arial", 12)  # 設定字型為Arial，字體大小為14
         self.combos = []
         for i in range(5) :
             combo = QComboBox(self)
@@ -40,10 +41,24 @@ class Tab1Widget(QWidget):
             self.quantity.append(quantity)
 
 
+        # 創建發票號碼 label
+        hbox_invoice = QHBoxLayout()
+        hbox_invoice.setAlignment(Qt.AlignLeft)
+        self.labelinvoice =  QLabel("發票號碼", self)  
+        self.labelinvoice.setFont(QtGui.QFont("Arial", 16))
+        # 創建發票號碼輸入欄位
+        self.invoice = QLineEdit(self)
+        self.invoice.setFixedWidth(130)
+        self.invoice.setMaxLength(10)
+        self.invoice.setFont(font)        
+        hbox_invoice.addWidget(self.labelinvoice)
+        hbox_invoice.addWidget(self.invoice)
+        hbox_invoice.addWidget(QLabel("                                                                                                                   "))
+
 
         # 创建水平布局，并将各控件添加到水平布局中
         self.hbox = []
-        font = QtGui.QFont("Arial", 12)  # 設定字型為Arial，字體大小為14
+
         for i in range(5):
             hbox = QHBoxLayout()
             label0 = QLabel(f'{i+1} 品項', self)          
@@ -90,6 +105,7 @@ class Tab1Widget(QWidget):
 
         # 创建垂直布局，并将水平布局添加到垂直布局中
         self.vbox1 = QVBoxLayout()
+        self.vbox1.addLayout(hbox_invoice)
         for i in range(5):
             self.vbox1.addLayout(self.hbox[i])
 
@@ -126,7 +142,11 @@ class Tab1Widget(QWidget):
             amount_text.append(self.amount_edit[i].text())
             quantity_text.append(self.quantity[i].currentText())
 
+        if len(self.invoice.text()) != 10 :
+            QMessageBox.information(self, 'error', '發票號碼有誤!') 
+            return           
         msg = ""
+        msg += f'發票號碼: {self.invoice.text()} \n'
         for i in range(5) :
             if amount_text[i].strip() and int(quantity_text[i]) > 0 :
                 msg += f'{product_text[i]} ,金額 {amount_text[i]}, 數量 {quantity_text[i]} \n'
@@ -168,22 +188,8 @@ class Tab1Widget(QWidget):
                 sheet.cell(row=max_row, column=1).value = "-"
                 sheet.cell(row=max_row, column=2).value = product_text[i]
                 sheet.cell(row=max_row, column=4).value = int(amount_text[i])
+                sheet.cell(row=max_row, column=6).value = self.invoice.text()
    
-        
-        # 進項稅額
-        tax_amount = self.taxAmount.text()
-        if tax_amount.strip() and int(tax_amount) > 0 :
-            max_row += 1
-            sheet.cell(row=max_row, column=1).value = "-"
-            sheet.cell(row=max_row, column=2).value = "進項稅額" 
-            sheet.cell(row=max_row, column=4).value = int(tax_amount)
-
-        # 現金欄位
-        max_row += 1
-        sheet.cell(row=max_row, column=1).value = "-"
-        sheet.cell(row=max_row, column=3).value = "現金" 
-        sheet.cell(row=max_row, column=5).value = TotalAmount      
-
 
         # 選擇工作表 存貨
         sheet2 = wb['存貨']
@@ -196,30 +202,29 @@ class Tab1Widget(QWidget):
                 sheet2.cell(row=max_row, column=1).value = "-"
                 sheet2.cell(row=max_row, column=2).value = product_text[i]
                 sheet2.cell(row=max_row, column=4).value = int(amount_text[i])
-
+                sheet2.cell(row=max_row, column=7).value = self.invoice.text()
 
 
         # 選擇工作表 進項稅額
         sheet3 = wb['進項稅額']
         # 找到 A 欄中最後一個有值的單元格
         max_row = self.find_last_empty_row(sheet3)
-        if tax_amount.strip() and int(tax_amount) > 0 :
+        if self.taxAmount.text().strip() and int(self.taxAmount.text()) > 0 :
             max_row += 1
             sheet3.cell(row=max_row, column=1).value = "-"
             sheet3.cell(row=max_row, column=2).value = "進項稅額" 
             sheet3.cell(row=max_row, column=4).value = int(self.taxAmount.text())     
-
+            sheet3.cell(row=max_row, column=7).value = self.invoice.text()
 
         # 選擇工作表 現金
         sheet4 = wb['現金']
         # 找到 A 欄中最後一個有值的單元格
         max_row = self.find_last_empty_row(sheet4)
-
         max_row += 1
         sheet4.cell(row=max_row, column=1).value = "-"
         sheet4.cell(row=max_row, column=3).value = "現金" 
         sheet4.cell(row=max_row, column=5).value = TotalAmount  
-
+        sheet4.cell(row=max_row, column=7).value = self.invoice.text()
 
         # 保存文件
         wb.save('112財報資料.xlsx')
