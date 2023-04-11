@@ -25,6 +25,7 @@ class Tab1Widget(QWidget):
         for i in range(5):
             amount = QLineEdit(self)
             amount.setValidator(QtGui.QIntValidator())
+            amount.textChanged.connect(self.updateSum)
             self.amount_edit.append(amount)
 
 
@@ -70,8 +71,12 @@ class Tab1Widget(QWidget):
         self.taxAmount.setFixedWidth(100)
         self.taxAmount.setFont(QtGui.QFont('Arial', 12))
         self.taxAmount.setValidator(QtGui.QIntValidator())
+        self.taxAmount.textChanged.connect(self.updateSum)
         hbox_tax.addWidget(self.taxAmount)
         hbox_tax.addWidget(QLabel("--------------------------------------------------------------------------------------------------"))
+        self.TotalAmtTxt = QLabel(self)
+        self.TotalAmtTxt.setFont(font)
+        hbox_tax.addWidget(self.TotalAmtTxt)
 
         # 送出按鈕
         self.button = QPushButton('送出')
@@ -96,6 +101,18 @@ class Tab1Widget(QWidget):
         # 設置按鈕點擊事件處理函數
         self.button.clicked.connect(self.buttonClicked)
         #self.button2.clicked.connect(self.resetData)
+
+
+
+    def updateSum(self):
+        sum = 0
+        for i in range(5) :
+            if self.amount_edit[i].text().strip():
+                sum += int(self.amount_edit[i].text())
+        if self.taxAmount.text().strip():
+            sum += int(self.taxAmount.text())
+        # 在標籤中顯示總和
+        self.TotalAmtTxt.setText(f'現金總和：{sum}')
 
     def buttonClicked(self):
         # 按鈕點擊事件處理函數 讀取介面內容
