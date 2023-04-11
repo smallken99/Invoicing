@@ -18,7 +18,7 @@ class Tab1Widget(QWidget):
             combo = QComboBox(self)
             for option in self.options :
                 combo.addItem(option)
-                combo.setFont(QtGui.QFont('Arial', 12))
+                combo.setFont(font)
             self.combos.append(combo)
 
         # 創建五個下拉式選單的陣列
@@ -37,7 +37,7 @@ class Tab1Widget(QWidget):
             quantity = QComboBox(self)
             for j in range(0, 11):
                 quantity.addItem(str(j))
-                quantity.setFont(QtGui.QFont('Arial', 12))
+                quantity.setFont(font)
                 quantity.currentIndexChanged.connect(self.updateSum)
             self.quantity.append(quantity)
 
@@ -46,7 +46,7 @@ class Tab1Widget(QWidget):
         hbox_invoice = QHBoxLayout()
         hbox_invoice.setAlignment(Qt.AlignLeft)
         self.labelinvoice =  QLabel("發票號碼", self)  
-        self.labelinvoice.setFont(QtGui.QFont("Arial", 16))
+        self.labelinvoice.setFont(font)
         # 創建發票號碼輸入欄位
         self.invoice = QLineEdit(self)
         self.invoice.setFixedWidth(130)
@@ -70,7 +70,7 @@ class Tab1Widget(QWidget):
             label.setFont(font)
             hbox.addWidget(label)
             self.amount_edit[i].setFixedWidth(100)
-            self.amount_edit[i].setFont(QtGui.QFont('Arial', 12))
+            self.amount_edit[i].setFont(font)
             hbox.addWidget(self.amount_edit[i])
             label2 = QLabel("數量", self)
             label2.setFont(font)
@@ -86,7 +86,7 @@ class Tab1Widget(QWidget):
         hbox_tax.addWidget(labelTax)
         self.taxAmount = QLineEdit(self)
         self.taxAmount.setFixedWidth(100)
-        self.taxAmount.setFont(QtGui.QFont('Arial', 12))
+        self.taxAmount.setFont(font)
         self.taxAmount.setValidator(QtGui.QIntValidator())
         self.taxAmount.textChanged.connect(self.updateSum)
         hbox_tax.addWidget(self.taxAmount)
@@ -97,7 +97,7 @@ class Tab1Widget(QWidget):
 
         # 送出按鈕
         self.button = QPushButton('送出')
-        self.button.setFont(QtGui.QFont('Arial', 12))
+        self.button.setFont(font)
 
         # 清除按鈕
         #self.button2 = QPushButton('清除')
@@ -241,3 +241,4 @@ class Tab1Widget(QWidget):
             self.amount_edit[i].clear()
             self.quantity[i].setCurrentIndex(0)
             self.taxAmount.clear()
+            self.invoice.clear()
