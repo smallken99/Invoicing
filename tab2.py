@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QApplication, QMessageBox, QHBoxLayout, QLabel, QWid
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 import openpyxl
+import my_module
 
 class Tab2Widget(QWidget):
     def __init__(self, options, parent):
@@ -168,7 +169,7 @@ class Tab2Widget(QWidget):
         sheet = wb['銷貨成本']
 
         # 找到 A 欄中最後一個有值的單元格
-        max_row = self.find_last_empty_row(sheet)
+        max_row = my_module.find_last_empty_row(sheet)
 
         # 寫入銷貨成本 分類帳
         max_row += 1
@@ -181,7 +182,7 @@ class Tab2Widget(QWidget):
         # 選擇工作表 存貨
         sheet = wb['存貨']
         # 找到 A 欄中最後一個有值的單元格
-        max_row = self.find_last_empty_row(sheet)
+        max_row = my_module.find_last_empty_row(sheet)
         # 寫入存貨 分類帳
         for i in range(5):
             if self.amount_edit[i].text().strip() and int(self.quantity[i].currentText()) > 0:
@@ -195,7 +196,7 @@ class Tab2Widget(QWidget):
         # 選擇工作表 現金
         sheet = wb['現金']
         # 找到 A 欄中最後一個有值的單元格
-        max_row = self.find_last_empty_row(sheet)
+        max_row = my_module.find_last_empty_row(sheet)
         # 寫入現金 分類帳 
         max_row += 1
         sheet.cell(row=max_row, column=1).value = "-"
@@ -206,7 +207,7 @@ class Tab2Widget(QWidget):
         # 選擇工作表 銷貨收入
         sheet = wb['銷貨收入']
         # 找到 A 欄中最後一個有值的單元格
-        max_row = self.find_last_empty_row(sheet)
+        max_row = my_module.find_last_empty_row(sheet)
         # 寫入銷貨收入 分類帳 
         if self.incomeAmount.text().strip() and int(self.incomeAmount.text()) > 0:
             max_row += 1
@@ -218,7 +219,7 @@ class Tab2Widget(QWidget):
         # 選擇工作表 銷項稅額
         sheet = wb['銷項稅額']
         # 找到 A 欄中最後一個有值的單元格
-        max_row = self.find_last_empty_row(sheet)
+        max_row = my_module.find_last_empty_row(sheet)
         # 寫入銷項稅額 分類帳
         if self.taxAmount.text().strip() and int(self.taxAmount.text()) > 0:
             max_row += 1
@@ -248,16 +249,6 @@ class Tab2Widget(QWidget):
         print('已將資料寫入 Excel 文件')
         QMessageBox.information(self, 'Save Excel', '資料寫入成功')
         self.resetData() # 重置資料
-
-
-    # 找出指定工作表中 A 欄最後一個非空單元格的位置，並回傳下一個單元格的索引    
-    def find_last_empty_row(self,sh):
-        max_row = sh.max_row
-        for i in range(max_row, 0, -1):
-            if sh.cell(row=i, column=1).value is not None:
-                max_row = i
-                break        
-        return max_row        
 
     # 重置資料
     def resetData(self):

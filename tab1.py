@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QApplication, QMessageBox, QHBoxLayout, QLabel, QWid
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt,QObject, pyqtSignal
 import openpyxl
+import my_module
 
 class Tab1Widget(QWidget):
     def __init__(self, options, parent):
@@ -142,8 +143,8 @@ class Tab1Widget(QWidget):
             amount_text.append(self.amount_edit[i].text())
             quantity_text.append(self.quantity[i].currentText())
 
-        if len(self.invoice.text()) != 10 :
-            QMessageBox.information(self, 'error', '發票號碼有誤!') 
+        if not my_module.check_invoice_number_format(self.invoice.text().strip()) :
+            QMessageBox.information(self, 'error', '發票號碼格式有誤!') 
             return           
         msg = ""
         msg += f'發票號碼: {self.invoice.text()} \n'
@@ -179,7 +180,7 @@ class Tab1Widget(QWidget):
         sheet = wb['112日記帳']
 
         # 找到 A 欄中最後一個有值的單元格
-        max_row = self.find_last_empty_row(sheet)
+        max_row = my_module.find_last_empty_row(sheet)
 
         # 在最後一行的下一行插入新資料
         for i in range(5):
@@ -194,7 +195,7 @@ class Tab1Widget(QWidget):
         # 選擇工作表 存貨
         sheet2 = wb['存貨']
         # 找到 A 欄中最後一個有值的單元格
-        max_row = self.find_last_empty_row(sheet2)
+        max_row = my_module.find_last_empty_row(sheet2)
         # 在最後一行的下一行插入新資料
         for i in range(5):
             if int(quantity_text[i]) > 0:
@@ -208,7 +209,7 @@ class Tab1Widget(QWidget):
         # 選擇工作表 進項稅額
         sheet3 = wb['進項稅額']
         # 找到 A 欄中最後一個有值的單元格
-        max_row = self.find_last_empty_row(sheet3)
+        max_row = my_module.find_last_empty_row(sheet3)
         if self.taxAmount.text().strip() and int(self.taxAmount.text()) > 0 :
             max_row += 1
             sheet3.cell(row=max_row, column=1).value = "-"
@@ -219,7 +220,8 @@ class Tab1Widget(QWidget):
         # 選擇工作表 現金
         sheet4 = wb['現金']
         # 找到 A 欄中最後一個有值的單元格
-        max_row = self.find_last_empty_row(sheet4)
+        max_row = my_module.find_last_empty_row(sheet4)
+        #max_row = self.find_last_empty_row(sheet4)
         max_row += 1
         sheet4.cell(row=max_row, column=1).value = "-"
         sheet4.cell(row=max_row, column=3).value = "現金" 
@@ -239,12 +241,3 @@ class Tab1Widget(QWidget):
             self.amount_edit[i].clear()
             self.quantity[i].setCurrentIndex(0)
             self.taxAmount.clear()
-
-    # 找出指定工作表中 A 欄最後一個非空單元格的位置，並回傳下一個單元格的索引    
-    def find_last_empty_row(self,sh):
-        max_row = sh.max_row
-        for i in range(max_row, 0, -1):
-            if sh.cell(row=i, column=1).value is not None:
-                max_row = i
-                break        
-        return max_row
