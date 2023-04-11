@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QMessageBox, QHBoxLayout, QLabel, QWidget, QPushButton, QLineEdit, QVBoxLayout, QComboBox, QTabWidget
 from PyQt5 import QtGui
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt,QObject, pyqtSignal
 import openpyxl
 
 class Tab1Widget(QWidget):
@@ -104,7 +104,6 @@ class Tab1Widget(QWidget):
         #self.button2.clicked.connect(self.resetData)
 
 
-
     def updateSum(self):
         sum = 0
         for i in range(5) :
@@ -116,6 +115,7 @@ class Tab1Widget(QWidget):
         self.TotalAmtTxt.setText(f'現金總和：{sum}')
 
     def buttonClicked(self):
+
         # 按鈕點擊事件處理函數 讀取介面內容
         product_text = []
         amount_text = []

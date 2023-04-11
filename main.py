@@ -15,17 +15,18 @@ class MyWindow(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        self.setGeometry(100, 100, 720, 350)
+        self.setGeometry(100, 100, 720, 400)
         self.setWindowTitle('My Window')
 
         self.tabs = QTabWidget(self)
-        self.tabs.setGeometry(2, 2, 718, 350)
+        self.tabs.setGeometry(2, 2, 718, 398)
         self.tab1 = Tab1Widget(self.options, self)
         self.tab2 = Tab2Widget(self.options, self)
         self.tabs.addTab(self.tab1, "進貨")
         self.tabs.addTab(self.tab2, "銷貨")
 
         self.show()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
