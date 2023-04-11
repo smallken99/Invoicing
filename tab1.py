@@ -36,6 +36,7 @@ class Tab1Widget(QWidget):
             for j in range(0, 11):
                 quantity.addItem(str(j))
                 quantity.setFont(QtGui.QFont('Arial', 12))
+                quantity.currentIndexChanged.connect(self.updateSum)
             self.quantity.append(quantity)
 
 
@@ -107,7 +108,7 @@ class Tab1Widget(QWidget):
     def updateSum(self):
         sum = 0
         for i in range(5) :
-            if self.amount_edit[i].text().strip():
+            if self.amount_edit[i].text().strip() and int(self.quantity[i].currentText()) > 0:
                 sum += int(self.amount_edit[i].text())
         if self.taxAmount.text().strip():
             sum += int(self.taxAmount.text())
