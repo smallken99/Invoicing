@@ -50,7 +50,7 @@ class Tab2Widget(QWidget):
         self.labelCost =  QLabel("銷售成本", self)  
         self.labelCost.setFont(font)
         hbox_cost.addWidget(self.labelCost)
-        hbox_cost.addWidget(QLabel("--------------------------------------------------------------------------------------",self))
+        hbox_cost.addWidget(QLabel("    -----------------------------------------------------------------",self))
 
 
         # 創建水平布局，並將各元件加到水平布局中
@@ -86,7 +86,7 @@ class Tab2Widget(QWidget):
         self.labelCash =  QLabel("現金", self)  
         self.labelCash.setFont(font)
         hbox_cash.addWidget(self.labelCash)
-        hbox_cash.addWidget(QLabel("--------------------------------------------------------------------------------------",self))
+        hbox_cash.addWidget(QLabel("    -----------------------------------------------------------------",self))
 
         # 創建銷收入
         hbox_income = QHBoxLayout()
