@@ -45,6 +45,23 @@ class Tab2Widget(QWidget):
   
 
         font = QtGui.QFont("Arial", 12)  # 設定字型為Arial，字體大小為12
+
+
+        # 創建發票號碼 label
+        hbox_invoice = QHBoxLayout()
+        hbox_invoice.setAlignment(Qt.AlignLeft)
+        self.labelinvoice =  QLabel("發票號碼", self)  
+        self.labelinvoice.setFont(font)
+        # 創建發票號碼輸入欄位
+        self.invoice = QLineEdit(self)
+        self.invoice.setFixedWidth(130)
+        self.invoice.setMaxLength(10)
+        self.invoice.setFont(font)        
+        hbox_invoice.addWidget(self.labelinvoice)
+        hbox_invoice.addWidget(self.invoice)
+        hbox_invoice.addWidget(QLabel("                                                                                                                   "))
+
+
         # 創建銷售成本 label
         hbox_cost = QHBoxLayout()
         hbox_cost.setAlignment(Qt.AlignLeft)
@@ -126,6 +143,7 @@ class Tab2Widget(QWidget):
 
         # 創建垂直布局
         self.vbox1 = QVBoxLayout()
+        self.vbox1.addLayout(hbox_invoice)
         self.vbox1.addLayout(hbox_cost)
         for i in range(5):
             self.vbox1.addLayout(self.hbox[i])
@@ -157,7 +175,14 @@ class Tab2Widget(QWidget):
         self.labelCash.setText(f'現金：{self.saleCashAmount}')              
 
     def buttonClicked(self):
+
+        # 檢查發票格式
+        if not my_module.check_invoice_number_format(self.invoice.text().strip()) :
+            QMessageBox.information(self, 'error', '發票號碼格式有誤!') 
+            return  
+
         msg = ""
+        msg += f'發票號碼: {self.invoice.text()} \n'
         # 打開 Excel 文件
         try:
             wb = openpyxl.load_workbook('112財報資料.xlsx', read_only=False)
@@ -176,6 +201,7 @@ class Tab2Widget(QWidget):
         sheet.cell(row=max_row, column=1).value = "-"
         sheet.cell(row=max_row, column=2).value = "銷貨成本"
         sheet.cell(row=max_row, column=4).value = self.saleCostAmount
+        sheet.cell(row=max_row, column=7).value = self.invoice.text()
         msg += f'銷貨成本: {self.saleCostAmount}\n'
 
 
@@ -190,6 +216,7 @@ class Tab2Widget(QWidget):
                 sheet.cell(row=max_row, column=1).value = "-"
                 sheet.cell(row=max_row, column=3).value = self.optionItems[i].currentText()
                 sheet.cell(row=max_row, column=5).value = int(self.amount_edit[i].text())
+                sheet.cell(row=max_row, column=7).value = self.invoice.text()
                 msg += f'------------ {self.optionItems[i].currentText()},金額: {self.amount_edit[i].text()},數量: {self.quantity[i].currentText()}\n'
  
 
@@ -202,6 +229,7 @@ class Tab2Widget(QWidget):
         sheet.cell(row=max_row, column=1).value = "-"
         sheet.cell(row=max_row, column=3).value = "現金"
         sheet.cell(row=max_row, column=5).value = self.saleCashAmount
+        sheet.cell(row=max_row, column=7).value = self.invoice.text()
         msg += f'現金: {self.saleCashAmount} \n'
 
         # 選擇工作表 銷貨收入
@@ -214,6 +242,7 @@ class Tab2Widget(QWidget):
             sheet.cell(row=max_row, column=1).value = "-"
             sheet.cell(row=max_row, column=3).value = "銷貨收入"
             sheet.cell(row=max_row, column=5).value = int(self.incomeAmount.text())
+            sheet.cell(row=max_row, column=7).value = self.invoice.text()
             msg += f'------------ 銷貨收入: {self.incomeAmount.text()}\n'
 
         # 選擇工作表 銷項稅額
@@ -226,6 +255,7 @@ class Tab2Widget(QWidget):
             sheet.cell(row=max_row, column=1).value = "-"
             sheet.cell(row=max_row, column=3).value = "銷項稅額"
             sheet.cell(row=max_row, column=5).value = int(self.taxAmount.text())
+            sheet.cell(row=max_row, column=7).value = self.invoice.text()
             msg += f'------------ 銷項稅額: {self.taxAmount.text()}\n'
 
 

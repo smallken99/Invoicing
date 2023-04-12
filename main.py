@@ -15,15 +15,19 @@ class MyWindow(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        self.setGeometry(100, 100, 720, 400)
+        self.setGeometry(100, 100, 720, 460)
         self.setWindowTitle('My Window')
 
         self.tabs = QTabWidget(self)
-        self.tabs.setGeometry(2, 2, 718, 398)
+        self.tabs.setGeometry(2, 2, 718, 456)
         self.tab1 = Tab1Widget(self.options, self)
         self.tab2 = Tab2Widget(self.options, self)
         self.tabs.addTab(self.tab1, "進貨")
         self.tabs.addTab(self.tab2, "銷貨")
+        # 设置选项卡标签的样式表
+        self.tabs.setStyleSheet("QTabBar::tab { font-size: 16px; padding: 16px; margin: 0 0px; }")
+
+
 
         self.show()
 
